@@ -6,8 +6,13 @@ export interface IAsyncTaskOptions {
 }
 
 export default class AsyncTaskThrottle<S extends ITask> {
-  public static create<T extends ITask>(task: T, size?: number, max?: number) {
-    const throttle = new AsyncTaskThrottle(task, size, max)
+  public static create<T extends ITask>(
+    task: T,
+    rateLimitCount?: number,
+    rateLimitDuration?: number,
+    max?: number
+  ) {
+    const throttle = new AsyncTaskThrottle(task, rateLimitCount, rateLimitDuration, max)
     function asyncTask(...args: any[]) {
       return new Promise((resolve, reject) => {
         throttle.push({
@@ -86,7 +91,7 @@ export default class AsyncTaskThrottle<S extends ITask> {
             if (this._workingCountProcessing === 0) {
               setTimeout(() => {
                 this._workingCount = 0
-                let length = Math.min(this._workerCount,this._queue.length) 
+                let length = Math.min(this._workerCount, this._queue.length)
                 for (let index = 0; index < length; index++) {
                   this.work()
                 }
