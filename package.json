@@ -40,9 +40,11 @@
     "preversion": "yarn lint"
   },
   "dependencies": {
+    "driftless": "^2.0.3",
     "node-fetch": "2.2.0"
   },
   "devDependencies": {
+    "@types/driftless": "^2.0.1",
     "@types/jest": "^24.0.15",
     "@types/node": "^12.6.8",
     "coveralls": "^3.0.5",
