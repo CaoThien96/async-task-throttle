@@ -25,12 +25,21 @@ export default class AsyncTaskThrottle<S extends ITask> {
   private _workerCount: number
   private _task: S
   private _workingCount: number
+  private _workingCountProcessing: number
+  private _rateLimitDuration: number
 
-  public constructor(task: S, workerCount?: number, queueLength?: number) {
+  public constructor(
+    task: S,
+    rateLimitCount?: number,
+    rateLimitDuration?: number,
+    queueLength?: number
+  ) {
     this._task = task
-    this._workerCount = workerCount || 6
+    this._workerCount = rateLimitCount || 1
+    this._rateLimitDuration = rateLimitDuration || 5000
     this._queueLength = queueLength || Infinity
     this._workingCount = 0
+    this._workingCountProcessing = 0
   }
 
   public getWorkingCount() {
@@ -64,16 +73,25 @@ export default class AsyncTaskThrottle<S extends ITask> {
       const options = this._queue.shift()
       if (options) {
         this._workingCount++
+        this._workingCountProcessing++
         this._task(...options.args)
-          .then(value => {
+          .then((value) => {
             options.resolve(value)
           })
-          .catch(error => {
+          .catch((error) => {
             options.reject(error)
           })
           .then(() => {
-            this._workingCount--
-            this.work()
+            this._workingCountProcessing--
+            if (this._workingCountProcessing === 0) {
+              setTimeout(() => {
+                this._workingCount = 0
+                let length = Math.min(this._workerCount,this._queue.length) 
+                for (let index = 0; index < length; index++) {
+                  this.work()
+                }
+              }, this._rateLimitDuration)
+            }
           })
       }
     }

@@ -39,7 +39,9 @@
     "prepublishOnly": "yarn test",
     "preversion": "yarn lint"
   },
-  "dependencies": {},
+  "dependencies": {
+    "node-fetch": "2.2.0"
+  },
   "devDependencies": {
     "@types/jest": "^24.0.15",
     "@types/node": "^12.6.8",
