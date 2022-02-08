@@ -2,9 +2,9 @@
 [![Build Status](https://travis-ci.org/breeze2/async-task-throttle.svg?branch=master)](https://travis-ci.org/breeze2/async-task-throttle)
 [![Coverage Status](https://coveralls.io/repos/github/breeze2/async-task-throttle/badge.svg?branch=master)](https://coveralls.io/github/breeze2/async-task-throttle?branch=master)
 
-# async-task-throttle
+# async-task-throttle-on-response
 > We refer lib https://github.com/breeze2/async-task-throttle
-> Also, we customize it to support rate limiting on response of async task
+> Also, we modify async-task-throttle to support rate limit on response
 
 ## Install
 
@@ -24,10 +24,9 @@ function task (url) {
     return fetch(url)
 }
 
-const throttleTask = AsyncTaskThrottle.create(task, 6, 100)
+const throttleTask = AsyncTaskThrottle.create(task, 1, 5000) // at most 1 requests per 5 second. Note 5s counted from the time of response
 
 // use `throttleTask` just like `task`
-// but up to 6 tasks are running at the same moment
 throttleTask('https://github.com/breeze2/markdown-it-all').then(value => {
     console.log(value)
 }).catch(error => {
@@ -43,7 +42,7 @@ throttleTask('https://github.com/breeze2/markdown-it-all').then(value => {
 ```js
 function AsyncTaskThrottle.create(
     task: T extends (...args: any[]) => Promise<any>,
-    limitCount?: number = 1,
+    rateLimitCount?: number = 1,
     rateLimitDuration?: number = 5000,
     max: number = Infinity
 ): T
@@ -51,8 +50,8 @@ function AsyncTaskThrottle.create(
 ```
 
 * task: the async task function.
-* limitCount: defualt 1, at the same moment, up to `limitCount` tasks are runing, others are in the waiting queue.
-* rateLimitDuration: default 5000, make `limitCount` request every `rateLimitDuration`. 
-> Note: Timer from the time of asynchronous task resolution
+* rateLimitCount: defualt 1, at the same moment, up to `rateLimitCount` tasks are runing, others are in the waiting queue.
+* rateLimitDuration: default 5000, make `rateLimitCount` request every `rateLimitDuration`. 
+> Note: Timer from last asynchronous task resolution time
 * max: defualt Infinity, when the length of waiting queue is greater than `max`, late tasks will be rejected instantly.
 
