@@ -1,6 +1,4 @@
-import {
-  setDriftlessTimeout,
-} from 'driftless';
+
 
 export type ITask<R = any> = (...args: any[]) => Promise<R>
 export interface IAsyncTaskOptions {
@@ -93,7 +91,7 @@ export default class AsyncTaskThrottle<S extends ITask> {
           .then(() => {
             this._workingCountProcessing--
             if (this._workingCountProcessing === 0) {
-              setDriftlessTimeout(() => {
+              setTimeout(() => {
                 this._workingCount = 0
                 let length = Math.min(this._workerCount, this._queue.length)
                 for (let index = 0; index < length; index++) {

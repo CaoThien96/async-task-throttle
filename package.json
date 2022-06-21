@@ -43,7 +43,6 @@
     "preversion": "yarn lint"
   },
   "dependencies": {
-    "driftless": "^2.0.3",
     "node-fetch": "2.2.0"
   },
   "devDependencies": {
